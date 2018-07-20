@@ -19,7 +19,7 @@ namespace Orleans.Runtime
         {
             this.config = config;
             this.serviceProvider = serviceProvider;
-            runtimeStats = new RuntimeStatisticsGroup();
+            runtimeStats = new RuntimeStatisticsGroup(config.UsePerformanceCounters);
             logStatistics = new LogStatistics(config.StatisticsLogWriteInterval, false, serializationManager);
             logger = LogManager.GetLogger(GetType().Name);
 

@@ -65,13 +65,21 @@ namespace Orleans.Runtime
 
 #endif
 
-        internal RuntimeStatisticsGroup()
+        internal RuntimeStatisticsGroup(bool usePerformanceCounters)
         {
             try
             {
                 Task.Run(() =>
                 {
-                    InitCpuMemoryCounters();
+                    if(usePerformanceCounters)
+                    {
+                        InitCpuMemoryCounters();
+                    }
+                    else
+                    {
+                        countersAvailable = false;
+                        logger.Warn(ErrorCode.PerfCounterConnectError, $"Skipping {nameof(InitCpuMemoryCounters)} as per configuration");
+                    }
                 }).WaitWithThrow(INITIALIZATION_TIMEOUT);
             }
             catch (TimeoutException)

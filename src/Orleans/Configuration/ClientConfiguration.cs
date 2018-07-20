@@ -139,6 +139,8 @@ namespace Orleans.Runtime.Configuration
 
         public LimitManager LimitManager { get; private set; }
 
+        public bool UsePerformanceCounters { get; set; }
+
         private static readonly TimeSpan DEFAULT_GATEWAY_LIST_REFRESH_PERIOD = TimeSpan.FromMinutes(1);
         private static readonly TimeSpan DEFAULT_STATS_METRICS_TABLE_WRITE_PERIOD = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan DEFAULT_STATS_PERF_COUNTERS_WRITE_PERIOD = Constants.INFINITE_TIMESPAN;
@@ -221,6 +223,8 @@ namespace Orleans.Runtime.Configuration
             StatisticsCollectionLevel = NodeConfiguration.DEFAULT_STATS_COLLECTION_LEVEL;
             LimitManager = new LimitManager();
             ProviderConfigurations = new Dictionary<string, ProviderCategoryConfiguration>();
+
+            UsePerformanceCounters = true;  //default 1.5.4 and prior
         }
 
         public void Load(TextReader input)
@@ -330,6 +334,13 @@ namespace Orleans.Runtime.Configuration
                             break;
                         case "Telemetry":
                             ConfigUtilities.ParseTelemetry(child);
+                            break;
+                        case "PerformanceCounters":
+                            if(child.HasAttribute("UsePerformanceCounters"))
+                            {
+                                UsePerformanceCounters = ConfigUtilities.ParseBool(child.GetAttribute("UsePerformanceCounters"),
+                                    "Invalid boolean value for UsePerformanceCounters attribute on PerformanceCounters element for " + ClientName);
+                            }
                             break;
                         default:
                             if (child.LocalName.EndsWith("Providers", StringComparison.Ordinal))
